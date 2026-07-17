@@ -4,6 +4,7 @@
 .*/
 !/.github
 !/.styleci.yml
+/.playwright-mcp
 .env
 .env.backup
 .env.production
