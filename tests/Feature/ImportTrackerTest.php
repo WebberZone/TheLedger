@@ -18,7 +18,7 @@ class ImportTrackerTest extends TestCase
     {
         parent::setUp();
 
-        $this->dbPath = tempnam(sys_get_temp_dir(), 'docket_import_test').'.sqlite';
+        $this->dbPath = tempnam(sys_get_temp_dir(), 'ledger_import_test').'.sqlite';
         putenv('DB_DATABASE='.$this->dbPath);
         config(['database.connections.sqlite.database' => $this->dbPath]);
 
@@ -96,7 +96,7 @@ class ImportTrackerTest extends TestCase
 
     private function buildTrackerXlsx(): string
     {
-        $pythonBin = config('docket.import.python_bin');
+        $pythonBin = config('ledger.import.python_bin');
         $path = tempnam(sys_get_temp_dir(), 'import_test').'.xlsx';
 
         $script = <<<'PY'

@@ -2,12 +2,12 @@
 new or existing model; old() wins over model values so failed
 validation keeps user input. --}}
 <div x-data="{
-        currency: '{{ old( 'currency', $transaction->currency ?? config( 'docket.base_currency' ) ) }}',
+        currency: '{{ old( 'currency', $transaction->currency ?? config( 'ledger.base_currency' ) ) }}',
         amount: '{{ old( 'amount', $transaction->exists ? $transaction->amount_major : '' ) }}',
         vat: '{{ old( 'vat', $transaction->exists && $transaction->vat_minor ? $transaction->vat_major : '' ) }}',
-        fxRate: '{{ old( 'fx_rate', $transaction->exists && $transaction->currency !== config( 'docket.base_currency' ) ? rtrim( rtrim( (string) $transaction->fx_rate, '0' ), '.' ) : '' ) }}',
+        fxRate: '{{ old( 'fx_rate', $transaction->exists && $transaction->currency !== config( 'ledger.base_currency' ) ? rtrim( rtrim( (string) $transaction->fx_rate, '0' ), '.' ) : '' ) }}',
         amountGbp: '{{ old( 'amount_gbp' ) }}',
-        currencySymbols: {{ json_encode( config( 'docket.currency_symbols' ) ) }},
+        currencySymbols: {{ json_encode( config( 'ledger.currency_symbols' ) ) }},
         get total() { return (parseFloat(this.amount) || 0) + (parseFloat(this.vat) || 0); },
         get currencySymbol() { return this.currencySymbols[this.currency] || '£'; },
         get gbpPreview() {
@@ -64,7 +64,7 @@ validation keeps user input. --}}
             <select id="currency" name="currency" x-model="currency"
                 class="mt-1 block w-full border-slate-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg shadow-sm">
                 @foreach ( settings( 'currencies' ) as $code )
-					<option value="{{ $code }}" @selected( old( 'currency', $transaction->currency ?? config( 'docket.base_currency' ) ) === $code )>
+					<option value="{{ $code }}" @selected( old( 'currency', $transaction->currency ?? config( 'ledger.base_currency' ) ) === $code )>
 						{{ $code }}</option>
 				@endforeach
             </select>
@@ -82,7 +82,7 @@ validation keeps user input. --}}
 
     {{-- Non-GBP: enter the actual GBP charged (statement figure) OR a
     rate — whichever you have; the other is derived on save. --}}
-    <div x-show="currency !== '{{ config( 'docket.base_currency' ) }}'" x-cloak class="grid grid-cols-1 gap-6 sm:grid-cols-2 bg-slate-50 rounded-md p-4">
+    <div x-show="currency !== '{{ config( 'ledger.base_currency' ) }}'" x-cloak class="grid grid-cols-1 gap-6 sm:grid-cols-2 bg-slate-50 rounded-md p-4">
         <div>
             <x-input-label for="amount_gbp" value="Actual GBP charged (from statement)" />
             <x-text-input id="amount_gbp" name="amount_gbp" type="number" step="0.01" min="0.01" inputmode="decimal"

@@ -11,7 +11,7 @@ use Throwable;
 
 /**
  * The installation engine shared by the console installer
- * (php artisan docket:install) and the web installer (/install).
+ * (php artisan ledger:install) and the web installer (/install).
  * Each step is a small idempotent method so either front-end can run
  * them one at a time and narrate progress in its own way.
  */
@@ -20,7 +20,7 @@ class Installer
     public function __construct(protected Application $app) {}
 
     /**
-     * Docket counts as installed once the owner account exists — the
+     * Ledger counts as installed once the owner account exists — the
      * final step of either installer. Anything earlier (missing .env,
      * empty database) is a fresh or half-finished install.
      */

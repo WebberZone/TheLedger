@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<ruleset name="Docket">
-    <description>PHPCS rules for the Docket Laravel project, aligned with the Laravel Pint preset.</description>
+<ruleset name="Ledger">
+    <description>PHPCS rules for the Ledger Laravel project, aligned with the Laravel Pint preset.</description>
 
     <!-- Use PSR-12 as the base; Laravel Pint's preset is a PHP-CS-Fixer configuration derived from PSR-12. -->
     <rule ref="PSR12">

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Docket') }}</title>
+    <title>{{ config('app.name', 'Ledger') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -54,7 +54,7 @@
         <aside class="hidden lg:fixed lg:inset-y-0 lg:z-40 lg:flex lg:w-60 lg:flex-col bg-slate-900">
             <div class="flex h-16 shrink-0 items-center gap-3 px-5">
                 <x-application-logo class="h-8 w-8" />
-                <span class="text-lg font-bold tracking-tight text-white">Docket</span>
+                <span class="text-lg font-bold tracking-tight text-white">Ledger</span>
             </div>
 
             <nav class="flex flex-1 flex-col gap-1 px-3 py-4">
@@ -95,7 +95,7 @@
         <header class="sticky top-0 z-40 flex h-14 items-center justify-between bg-slate-900 px-4 lg:hidden">
             <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5">
                 <x-application-logo class="h-7 w-7" />
-                <span class="text-base font-bold tracking-tight text-white">Docket</span>
+                <span class="text-base font-bold tracking-tight text-white">Ledger</span>
             </a>
             <button @click="mobileMenu = !mobileMenu"
                 class="rounded-md p-2 text-slate-300 hover:bg-slate-800 hover:text-white">

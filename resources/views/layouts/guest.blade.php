@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Docket') }}</title>
+    <title>{{ config('app.name', 'Ledger') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -22,7 +22,7 @@
     <div class="flex min-h-screen flex-col items-center bg-slate-100 pt-6 sm:justify-center sm:pt-0">
         <a href="/" class="flex flex-col items-center gap-3">
             <x-application-logo class="h-14 w-14" />
-            <span class="text-2xl font-bold tracking-tight text-slate-900">Docket</span>
+            <span class="text-2xl font-bold tracking-tight text-slate-900">Ledger</span>
         </a>
 
         <div class="mt-8 w-full bg-white px-8 py-8 shadow-sm border border-slate-200 sm:max-w-md sm:rounded-2xl">
@@ -33,7 +33,7 @@
             {{ $slot }}
         </div>
 
-        <p class="mt-6 text-xs text-slate-400">Docket — cost &amp; expense tracker</p>
+        <p class="mt-6 text-xs text-slate-400">Ledger — cost &amp; expense tracker</p>
     </div>
 </body>
 

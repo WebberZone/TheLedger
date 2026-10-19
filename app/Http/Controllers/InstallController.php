@@ -85,8 +85,8 @@ class InstallController extends Controller
             // hashed straight into the database below.
             $this->installer->writeEnvValues([
                 'APP_URL' => $data['url'],
-                'DOCKET_USER_NAME' => $data['name'],
-                'DOCKET_USER_EMAIL' => $data['email'],
+                'LEDGER_USER_NAME' => $data['name'],
+                'LEDGER_USER_EMAIL' => $data['email'],
             ]);
 
             $this->installer->ensureSqliteDatabase();

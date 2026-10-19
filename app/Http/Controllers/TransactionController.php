@@ -70,7 +70,7 @@ abstract class TransactionController extends Controller
         return view(
             'transactions.create',
             [
-                'transaction' => new $modelClass(['occurred_on' => now()->toDateString(), 'currency' => config('docket.base_currency')]),
+                'transaction' => new $modelClass(['occurred_on' => now()->toDateString(), 'currency' => config('ledger.base_currency')]),
                 ...$this->formLookups(),
                 ...$this->viewContext(),
             ]
@@ -219,7 +219,7 @@ abstract class TransactionController extends Controller
      */
     public function export(Request $request): StreamedResponse
     {
-        $filename = sprintf('docket-%s-%s.csv', $this->routePrefix(), now()->format('Y-m-d'));
+        $filename = sprintf('ledger-%s-%s.csv', $this->routePrefix(), now()->format('Y-m-d'));
 
         return response()->streamDownload(
             function () use ($request) {

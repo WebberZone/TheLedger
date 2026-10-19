@@ -100,27 +100,27 @@ class ToolsTest extends TestCase
         );
     }
 
-    public function test_docket_ocr_command_requeues_all_receipts_with_the_all_option(): void
+    public function test_ledger_ocr_command_requeues_all_receipts_with_the_all_option(): void
     {
         Queue::fake();
 
         $this->makeReceipt();
         $this->makeReceipt(['supplier' => 'Tesco']);
 
-        $this->artisan('docket:ocr', ['--all' => true])
+        $this->artisan('ledger:ocr', ['--all' => true])
             ->expectsOutputToContain('Queued OCR for all 2 receipt(s).')
             ->assertSuccessful();
 
         Queue::assertPushed(ExtractReceiptData::class, 2);
     }
 
-    public function test_docket_ocr_command_targets_a_single_receipt_by_id(): void
+    public function test_ledger_ocr_command_targets_a_single_receipt_by_id(): void
     {
         Queue::fake();
 
         $receipt = $this->makeReceipt(['supplier' => 'Tesco']);
 
-        $this->artisan('docket:ocr', ['receipt' => $receipt->id])
+        $this->artisan('ledger:ocr', ['receipt' => $receipt->id])
             ->expectsOutputToContain("Queued OCR for receipt {$receipt->id}")
             ->assertSuccessful();
 
@@ -130,14 +130,27 @@ class ToolsTest extends TestCase
         );
     }
 
-    public function test_docket_ocr_command_fails_cleanly_for_a_missing_receipt(): void
+    public function test_ledger_ocr_command_fails_cleanly_for_a_missing_receipt(): void
     {
         Queue::fake();
 
-        $this->artisan('docket:ocr', ['receipt' => 999999])
+        $this->artisan('ledger:ocr', ['receipt' => 999999])
             ->expectsOutputToContain('Receipt 999999 not found.')
             ->assertFailed();
 
         Queue::assertNothingPushed();
+    }
+
+    public function test_pre_rename_docket_command_name_still_works(): void
+    {
+        Queue::fake();
+
+        $this->makeReceipt();
+
+        $this->artisan('docket:ocr', ['--all' => true])
+            ->expectsOutputToContain('Queued OCR for all 1 receipt(s).')
+            ->assertSuccessful();
+
+        Queue::assertPushed(ExtractReceiptData::class, 1);
     }
 }

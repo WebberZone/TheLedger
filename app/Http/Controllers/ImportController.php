@@ -32,8 +32,8 @@ class ImportController extends Controller
 
         $process = new Process(
             [
-                config('docket.import.python_bin'),
-                config('docket.import.script'),
+                config('ledger.import.python_bin'),
+                config('ledger.import.script'),
                 $fullPath,
                 '--db',
                 config('database.connections.sqlite.database'),

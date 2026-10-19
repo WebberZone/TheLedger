@@ -1,10 +1,10 @@
 @extends('install.layout')
 
 @section('content')
-    <h2>Welcome to the Docket installer</h2>
+    <h2>Welcome to the Ledger installer</h2>
     <p>
         This wizard checks your server, creates the configuration file and
-        database, and sets up your login. It only works while Docket is not
+        database, and sets up your login. It only works while Ledger is not
         yet installed — once your account exists it disables itself.
     </p>
 

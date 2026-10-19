@@ -33,7 +33,7 @@
                         <dt class="font-medium text-slate-500">Amount</dt>
                         <dd class="mt-1 text-slate-900">
                             £{{ number_format($transaction->amount_gbp_minor / 100, 2) }}
-                            @if ($transaction->currency !== config('docket.base_currency'))
+                            @if ($transaction->currency !== config('ledger.base_currency'))
                                 <span class="text-slate-500">({{ $transaction->currency }} {{ $transaction->total_major }} @
                                     {{ rtrim(rtrim((string) $transaction->fx_rate, '0'), '.') }})</span>
                             @endif

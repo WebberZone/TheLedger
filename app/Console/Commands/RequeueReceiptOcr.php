@@ -14,7 +14,14 @@ use Illuminate\Console\Command;
  */
 class RequeueReceiptOcr extends Command
 {
-    protected $signature = 'docket:ocr
+    /**
+     * The pre-rename name, kept so existing scripts and crontabs still work.
+     *
+     * @var list<string>
+     */
+    protected $aliases = ['docket:ocr'];
+
+    protected $signature = 'ledger:ocr
                             {receipt? : Re-run OCR for a single receipt ID}
                             {--all : Re-run OCR for every receipt, even ones that already have results}';
 

@@ -1,7 +1,7 @@
 // Minimal service worker: enough for installability. Everything behind
 // auth is useless offline, so requests just pass through to the network,
 // with a tiny cached fallback page for offline navigations.
-const CACHE = 'docket-v1';
+const CACHE = 'ledger-v1';
 const OFFLINE_URL = '/offline.html';
 
 self.addEventListener('install', (event) => {

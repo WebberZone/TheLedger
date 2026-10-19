@@ -80,8 +80,8 @@ class TrackerExportController extends Controller
 
         $process = new Process(
             [
-                config('docket.export.python_bin'),
-                config('docket.export.script'),
+                config('ledger.export.python_bin'),
+                config('ledger.export.script'),
                 storage_path('app/templates/tracker-template.xlsx'),
                 $jsonPath,
                 $outputPath,
@@ -114,7 +114,7 @@ class TrackerExportController extends Controller
                 'category' => $t->category?->name,
                 'counterparty' => $t->counterparty,
                 'currency' => $t->currency,
-                'fx_rate' => $t->currency === config('docket.base_currency') ? null : (float) $t->fx_rate,
+                'fx_rate' => $t->currency === config('ledger.base_currency') ? null : (float) $t->fx_rate,
                 'amount' => $t->amount_minor / 100,
                 'vat' => $t->vat_minor / 100,
                 'amount_gbp' => $t->amount_gbp_minor / 100,

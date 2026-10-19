@@ -24,7 +24,7 @@ class WebInstallerTest extends TestCase
     {
         parent::setUp();
 
-        $this->envDir = sys_get_temp_dir().'/docket-web-install-test-'.Str::random(8);
+        $this->envDir = sys_get_temp_dir().'/ledger-web-install-test-'.Str::random(8);
         mkdir($this->envDir);
         copy(base_path('.env.example'), $this->envDir.'/.env.example');
 
@@ -44,7 +44,7 @@ class WebInstallerTest extends TestCase
     private function validPayload(): array
     {
         return [
-            'url' => 'https://docket.example.com',
+            'url' => 'https://ledger.example.com',
             'name' => 'Jane Doe',
             'email' => 'jane@example.com',
             'password' => 'super-secret-99',
@@ -56,7 +56,7 @@ class WebInstallerTest extends TestCase
     {
         $this->get('/install')
             ->assertOk()
-            ->assertSee('Welcome to the Docket installer')
+            ->assertSee('Welcome to the Ledger installer')
             ->assertSee('PHP 8.3 or newer')
             ->assertSee('Continue');
     }
@@ -65,7 +65,7 @@ class WebInstallerTest extends TestCase
     {
         $this->get('/install/setup')
             ->assertOk()
-            ->assertSee('Set up Docket')
+            ->assertSee('Set up Ledger')
             ->assertSee('Seed starter categories');
     }
 
@@ -73,7 +73,7 @@ class WebInstallerTest extends TestCase
     {
         $response = $this->post('/install/setup', $this->validPayload() + ['seed_lookups' => '1']);
 
-        $response->assertOk()->assertSee('Docket is installed');
+        $response->assertOk()->assertSee('Ledger is installed');
 
         $user = User::query()->where('email', 'jane@example.com')->firstOrFail();
         $this->assertSame('Jane Doe', $user->name);
@@ -82,9 +82,9 @@ class WebInstallerTest extends TestCase
         $this->assertGreaterThan(0, Category::query()->count());
 
         $env = (string) file_get_contents($this->envDir.'/.env');
-        $this->assertStringContainsString('APP_URL=https://docket.example.com', $env);
-        $this->assertStringContainsString('DOCKET_USER_NAME="Jane Doe"', $env);
-        $this->assertStringContainsString('DOCKET_USER_EMAIL=jane@example.com', $env);
+        $this->assertStringContainsString('APP_URL=https://ledger.example.com', $env);
+        $this->assertStringContainsString('LEDGER_USER_NAME="Jane Doe"', $env);
+        $this->assertStringContainsString('LEDGER_USER_EMAIL=jane@example.com', $env);
         $this->assertMatchesRegularExpression('/^APP_KEY="?base64:/m', $env);
         $this->assertStringNotContainsString('super-secret-99', $env);
     }
@@ -94,7 +94,7 @@ class WebInstallerTest extends TestCase
         // An unticked checkbox simply isn't posted.
         $this->post('/install/setup', $this->validPayload())
             ->assertOk()
-            ->assertSee('Docket is installed');
+            ->assertSee('Ledger is installed');
 
         $this->assertSame(0, Category::query()->count());
         $this->assertSame(1, User::query()->count());
@@ -107,7 +107,7 @@ class WebInstallerTest extends TestCase
 
         $this->post('/install/setup', $payload)
             ->assertStatus(422)
-            ->assertSee('Set up Docket');
+            ->assertSee('Set up Ledger');
 
         $this->assertSame(0, User::query()->count());
     }

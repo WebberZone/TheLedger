@@ -4,14 +4,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Docket Application Settings
+    | Ledger Application Settings
     |--------------------------------------------------------------------------
     |
-    | Docket-specific policy that used to live hardcoded across controllers,
+    | Ledger-specific policy that used to live hardcoded across controllers,
     | jobs, seeders and views. Most of this is app policy rather than
     | per-deployment secrets, so it lives here (not .env). Only the handful
     | of values that genuinely differ per host are pulled from the
     | environment below.
+    |
+    | Ledger was called Docket until October 2026. Every LEDGER_* variable
+    | still falls back to its old DOCKET_* name, so an existing .env keeps
+    | working until it is updated.
     |
     */
 
@@ -28,11 +32,11 @@ return [
     */
     'user' => [
         // ?: not the env() default param: a present-but-empty line in .env
-        // (e.g. DOCKET_USER_NAME=) would otherwise seed an empty string
+        // (e.g. LEDGER_USER_NAME=) would otherwise seed an empty string
         // rather than falling back to these defaults.
-        'name' => env('DOCKET_USER_NAME') ?: 'Docket Owner',
-        'email' => env('DOCKET_USER_EMAIL') ?: 'owner@example.com',
-        'password' => env('DOCKET_USER_PASSWORD') ?: 'change-me-on-first-login',
+        'name' => env('LEDGER_USER_NAME') ?: env('DOCKET_USER_NAME') ?: 'Ledger Owner',
+        'email' => env('LEDGER_USER_EMAIL') ?: env('DOCKET_USER_EMAIL') ?: 'owner@example.com',
+        'password' => env('LEDGER_USER_PASSWORD') ?: env('DOCKET_USER_PASSWORD') ?: 'change-me-on-first-login',
     ],
 
     /*
@@ -76,11 +80,11 @@ return [
     'ocr' => [
         'tries' => 3,
         'backoff' => [10, 60],
-        'tesseract_binary' => env('DOCKET_TESSERACT_BIN', 'tesseract'),
+        'tesseract_binary' => env('LEDGER_TESSERACT_BIN', env('DOCKET_TESSERACT_BIN', 'tesseract')),
         // How long a capture's pending-receipt cache entry (photo path +
         // OCR result, keyed by token) survives before /expenses/create can
         // no longer prefill from it. The file on disk outlives this — see
-        // docket:prune-captures.
+        // ledger:prune-captures.
         'capture_ttl' => 3600,
     ],
 
@@ -90,12 +94,12 @@ return [
     */
     'export' => [
         'python_bin' => env(
-            'DOCKET_PYTHON_BIN',
-            base_path('python/venv/bin/python')
+            'LEDGER_PYTHON_BIN',
+            env('DOCKET_PYTHON_BIN', base_path('python/venv/bin/python'))
         ),
         'script' => env(
-            'DOCKET_PYTHON_SCRIPT',
-            base_path('python/scripts/populate_tracker.py')
+            'LEDGER_PYTHON_SCRIPT',
+            env('DOCKET_PYTHON_SCRIPT', base_path('python/scripts/populate_tracker.py'))
         ),
     ],
 
@@ -105,12 +109,12 @@ return [
     */
     'import' => [
         'python_bin' => env(
-            'DOCKET_PYTHON_BIN',
-            base_path('python/venv/bin/python')
+            'LEDGER_PYTHON_BIN',
+            env('DOCKET_PYTHON_BIN', base_path('python/venv/bin/python'))
         ),
         'script' => env(
-            'DOCKET_PYTHON_IMPORT_SCRIPT',
-            base_path('python/scripts/import_tracker.py')
+            'LEDGER_PYTHON_IMPORT_SCRIPT',
+            env('DOCKET_PYTHON_IMPORT_SCRIPT', base_path('python/scripts/import_tracker.py'))
         ),
     ],
 

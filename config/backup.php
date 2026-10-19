@@ -239,7 +239,7 @@ return [
         'mail' => [
             // Falls back to the owner account's email when no dedicated
             // backup-notification address is configured.
-            'to' => env('BACKUP_NOTIFY_EMAIL') ?: (env('DOCKET_USER_EMAIL') ?: 'owner@example.com'),
+            'to' => env('BACKUP_NOTIFY_EMAIL') ?: (env('LEDGER_USER_EMAIL') ?: env('DOCKET_USER_EMAIL') ?: 'owner@example.com'),
 
             'from' => [
                 'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),

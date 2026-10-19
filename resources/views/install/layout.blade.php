@@ -9,7 +9,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
-    <title>Install Docket</title>
+    <title>Install Ledger</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -81,7 +81,7 @@
 <body>
     <main>
         <div class="brand">
-            <h1>Docket</h1>
+            <h1>Ledger</h1>
             <p>Self-hosted expense &amp; receipt tracking</p>
         </div>
         <div class="card">

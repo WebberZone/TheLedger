@@ -3,7 +3,7 @@
 Usage: import_tracker.py <path/to/Accounts Tracker.xlsx> [--db <path/to/database.sqlite>]
 
 Reads the Income, Expense, CF and Balances sheets and inserts them into the
-Docket SQLite database. Categories, payment methods and the default business
+Ledger SQLite database. Categories, payment methods and the default business
 unit are matched by name and created on demand. Rows are matched by the
 natural key (date, counterparty, GBP amount) and skipped if already present.
 """
@@ -269,7 +269,7 @@ def import_balances(cur, ws, counts):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Import the legacy Accounts Tracker workbook into Docket."
+        description="Import the legacy Accounts Tracker workbook into Ledger."
     )
     parser.add_argument("workbook", help="Path to the Accounts Tracker.xlsx file")
     parser.add_argument(
