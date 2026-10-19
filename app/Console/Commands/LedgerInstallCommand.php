@@ -13,16 +13,23 @@ use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\password;
 use function Laravel\Prompts\text;
 
-#[Signature('docket:install
+#[Signature('ledger:install
     {--url= : Public URL the app will be served from}
     {--name= : Owner account name}
     {--email= : Owner account email}
     {--password= : Owner account password (auto-generated when omitted non-interactively)}
     {--skip-lookups : Start with empty categories, business units and payment methods}
     {--force : Run even when an account already exists}')]
-#[Description('Install Docket: create .env, generate the app key, migrate the database and create the owner account')]
-class DocketInstallCommand extends Command
+#[Description('Install Ledger: create .env, generate the app key, migrate the database and create the owner account')]
+class LedgerInstallCommand extends Command
 {
+    /**
+     * The pre-rename name, kept so existing scripts and crontabs still work.
+     *
+     * @var list<string>
+     */
+    protected $aliases = ['docket:install'];
+
     /**
      * A password generated for a non-interactive install with no --password,
      * remembered so the closing summary can show it exactly once.
@@ -31,7 +38,7 @@ class DocketInstallCommand extends Command
 
     public function handle(Installer $installer): int
     {
-        $this->components->info('Installing Docket.');
+        $this->components->info('Installing Ledger.');
 
         $problems = $installer->blockingProblems();
 
@@ -45,7 +52,7 @@ class DocketInstallCommand extends Command
 
         if ($installer->isInstalled() && ! $this->option('force')) {
             $this->components->warn(
-                'Docket already has a user account. Re-run with --force to run the installer anyway (existing data is never deleted).'
+                'Ledger already has a user account. Re-run with --force to run the installer anyway (existing data is never deleted).'
             );
 
             return SymfonyCommand::FAILURE;
@@ -61,7 +68,7 @@ class DocketInstallCommand extends Command
 
         $url = $this->option('url')
             ?? $this->promptOr(fn (): string => text(
-                label: 'What URL will Docket be served from?',
+                label: 'What URL will Ledger be served from?',
                 default: 'http://localhost:8000',
                 required: true,
             ), 'http://localhost:8000');
@@ -69,9 +76,9 @@ class DocketInstallCommand extends Command
         $name = $this->option('name')
             ?? $this->promptOr(fn (): string => text(
                 label: 'Your name',
-                default: 'Docket Owner',
+                default: 'Ledger Owner',
                 required: true,
-            ), 'Docket Owner');
+            ), 'Ledger Owner');
 
         $email = $this->option('email')
             ?? $this->promptOr(fn (): string => text(
@@ -98,13 +105,13 @@ class DocketInstallCommand extends Command
         }
 
         // Persist the identity to .env so a later `db:seed` recreates the
-        // same account rather than the config/docket.php fallback owner.
+        // same account rather than the config/ledger.php fallback owner.
         // The password is deliberately NOT written to .env: it is hashed
         // straight into the database below.
         $installer->writeEnvValues([
             'APP_URL' => $url,
-            'DOCKET_USER_NAME' => $name,
-            'DOCKET_USER_EMAIL' => $email,
+            'LEDGER_USER_NAME' => $name,
+            'LEDGER_USER_EMAIL' => $email,
         ]);
         $this->components->task('.env updated (APP_URL, owner name/email)', fn (): bool => true);
 
@@ -181,7 +188,7 @@ class DocketInstallCommand extends Command
     protected function printNextSteps(string $url, string $email): void
     {
         $this->newLine();
-        $this->components->info('Docket is installed.');
+        $this->components->info('Ledger is installed.');
 
         if ($this->generatedPassword !== null) {
             $this->components->warn(
@@ -199,7 +206,7 @@ class DocketInstallCommand extends Command
 
         $steps[] = 'Serve the app: point your web server at public/ (or run: php artisan serve)';
         $steps[] = 'Run a queue worker for receipt OCR: php artisan queue:work (use systemd/supervisor in production)';
-        $steps[] = 'Add the scheduler cron: * * * * * cd /path/to/docket && php artisan schedule:run >> /dev/null 2>&1';
+        $steps[] = 'Add the scheduler cron: * * * * * cd /path/to/ledger && php artisan schedule:run >> /dev/null 2>&1';
         $steps[] = 'Optional OCR: set GOOGLE_VISION_CREDENTIALS in .env, or install tesseract for the free local fallback';
         $steps[] = 'Optional off-site backups: fill in the BACKUP_* keys in .env (S3-compatible bucket)';
         $steps[] = 'Optional XLSX export: python3 -m venv python/venv && python/venv/bin/pip install -r python/requirements.txt';

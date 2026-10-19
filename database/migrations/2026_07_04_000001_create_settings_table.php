@@ -8,7 +8,7 @@ return new class() extends Migration
 {
     public function up(): void
     {
-        // DB-backed overrides for the editable knobs in config/docket.php.
+        // DB-backed overrides for the editable knobs in config/ledger.php.
         // One row per dotted key (e.g. "receipts.max_kb"); value is JSON so
         // arrays (currencies, ocr.backoff) and scalars share one column.
         // Read through App\Services\Settings, which falls back to the

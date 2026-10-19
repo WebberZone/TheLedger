@@ -1,6 +1,6 @@
 {
-    "name": "Docket",
-    "short_name": "Docket",
+    "name": "Ledger",
+    "short_name": "Ledger",
     "description": "Snap a receipt, log the expense.",
     "start_url": "/capture",
     "display": "standalone",

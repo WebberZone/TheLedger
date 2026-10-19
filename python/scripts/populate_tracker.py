@@ -1,4 +1,4 @@
-"""Populate the Docket Accounts Tracker template with live data.
+"""Populate the Ledger Accounts Tracker template with live data.
 
 Usage: populate_tracker.py <template.xlsx> <data.json> <output.xlsx>
 

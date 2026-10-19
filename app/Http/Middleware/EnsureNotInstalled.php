@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Gates the web installer: once Docket has its owner account the /install
+ * Gates the web installer: once Ledger has its owner account the /install
  * routes stop existing in any useful sense and just bounce to the login
  * screen, so a live site never exposes a working installer.
  */

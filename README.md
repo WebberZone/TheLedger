@@ -1,4 +1,4 @@
-# Docket
+# Ledger
 
 A single-user cost/expense tracker you can self-host. Snap a receipt on
 the phone, have it logged in two taps; year-end is a CSV export mapped to
@@ -41,12 +41,33 @@ Everything the old "Accounts Tracker" spreadsheet did, plus receipt capture:
 
 ### Importing the old tracker
 
-`php artisan docket:import-tracker <dir>` loads CSVs exported from the
+`php artisan ledger:import-tracker <dir>` loads CSVs exported from the
 spreadsheet (income, expenses, cash flows, balances) and prints per-ledger
 totals to verify against the workbook. The export script lives in the
 session scratchpad (`export_csv.py`); it reads a *copy* of the xlsx and
 never touches the original. Already run against the tracker as of
 July 2026 — totals matched to the penny.
+
+## Upgrading from Docket
+
+This app was called Docket until October 2026; the name now belongs to a
+separate read-later project. An existing install keeps working without
+changes, but tidy up when convenient:
+
+- **Git remote:** `git remote set-url origin https://github.com/WebberZone/TheLedger.git`.
+  Do this before the new TheDocket repository exists, or `git pull` will
+  fetch the wrong project.
+- **`.env`:** rename `DOCKET_*` variables to `LEDGER_*`. The old names are
+  still read as fallbacks.
+- **Commands:** `docket:install`, `docket:optimize`, `docket:ocr`,
+  `docket:prune-captures` and `docket:import-tracker` remain as aliases of
+  their `ledger:*` replacements.
+- **`APP_NAME`:** spatie/laravel-backup names its bucket folder after
+  `APP_NAME`. Changing it from `Docket` starts a fresh folder, so move the
+  existing archives across (or leave `APP_NAME` alone) to keep retention
+  and `backup:monitor` working on the full history. It also changes the
+  session cookie name, so you will be logged out once.
+- Run `php artisan config:cache` after deploying, as usual.
 
 ## Installation
 
@@ -63,8 +84,8 @@ in Settings, or leave you to start empty.
 ### Web installer (recommended on a server)
 
 ```sh
-git clone https://github.com/WebberZone/TheDocket.git docket
-cd docket
+git clone https://github.com/WebberZone/TheLedger.git ledger
+cd ledger
 composer install --no-dev
 npm install && npm run build
 ```
@@ -72,23 +93,23 @@ npm install && npm run build
 Point your web server at `public/`, then open **`https://your-domain/install`**
 in a browser. The wizard checks the server requirements (PHP version,
 extensions, writable directories), then asks for your site URL, name, email
-and password, and installs. It only exists while Docket has no user account —
+and password, and installs. It only exists while Ledger has no user account —
 as soon as your login is created, `/install` permanently redirects to the
 login screen.
 
 ### Console installer
 
 ```sh
-git clone https://github.com/WebberZone/TheDocket.git docket
-cd docket
-composer setup      # deps + frontend build + guided php artisan docket:install
+git clone https://github.com/WebberZone/TheLedger.git ledger
+cd ledger
+composer setup      # deps + frontend build + guided php artisan ledger:install
 ```
 
 The console installer is safe to re-run (`--force`) and never deletes data.
 For scripted/non-interactive installs pass the answers as flags:
 
 ```sh
-php artisan docket:install --url=https://docket.example.com \
+php artisan ledger:install --url=https://ledger.example.com \
     --name="Jane Doe" --email=jane@example.com --password=... \
     --no-interaction   # omit --password to have one generated and shown once
 ```
@@ -112,7 +133,7 @@ Tests: `php artisan test`. Dev server (app + queue + logs + Vite):
 1. Nginx + PHP 8.3-FPM, standard Laravel vhost with root at `public/`.
    Let's Encrypt via `certbot --nginx -d your-domain`. HTTPS is required
    for the PWA install + camera capture.
-2. Visit `https://your-domain/install` (or run `php artisan docket:install`)
+2. Visit `https://your-domain/install` (or run `php artisan ledger:install`)
    and give it the real production URL and your login details, then in
    `.env` set `APP_ENV=production`,
    `APP_DEBUG=false`, `GOOGLE_VISION_CREDENTIALS` (or install tesseract),
@@ -123,7 +144,7 @@ Tests: `php artisan test`. Dev server (app + queue + logs + Vite):
 
    ```ini
    [Service]
-   ExecStart=/usr/bin/php /var/www/docket/artisan queue:work --tries=3 --max-time=3600
+   ExecStart=/usr/bin/php /var/www/ledger/artisan queue:work --tries=3 --max-time=3600
    Restart=always
    User=www-data
    ```
@@ -132,7 +153,7 @@ Tests: `php artisan test`. Dev server (app + queue + logs + Vite):
    and the OCI keep-alive burn that stops idle reclaim):
 
    ```
-   * * * * * cd /var/www/docket && php artisan schedule:run >> /dev/null 2>&1
+   * * * * * cd /var/www/ledger && php artisan schedule:run >> /dev/null 2>&1
    ```
 
 ## Backups (spatie/laravel-backup)
@@ -149,7 +170,7 @@ Fill in `.env`:
 ```
 BACKUP_ACCESS_KEY_ID=...
 BACKUP_SECRET_ACCESS_KEY=...
-BACKUP_BUCKET=docket-backups
+BACKUP_BUCKET=ledger-backups
 BACKUP_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
 BACKUP_REGION=auto
 ```
@@ -159,7 +180,7 @@ BACKUP_REGION=auto
 ```sh
 php artisan backup:run                  # take one
 # download the newest zip from the bucket, then:
-unzip Docket/….zip -d /tmp/restore
+unzip Ledger/….zip -d /tmp/restore
 mv /tmp/restore/db-dumps/database.sqlite database/database.sqlite
 rsync -a /tmp/restore/…/storage/app/private/ storage/app/private/
 php artisan migrate:status              # sanity-check it boots against the restored DB

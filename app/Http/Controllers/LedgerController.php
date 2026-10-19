@@ -20,7 +20,7 @@ class LedgerController extends Controller
         $paymentMethods = PaymentMethod::active()->get();
 
         $methodId = $request->input('payment_method_id');
-        $currency = strtoupper($request->input('currency', config('docket.base_currency')));
+        $currency = strtoupper($request->input('currency', config('ledger.base_currency')));
 
         $entries = collect();
         $balance = 0;

@@ -54,7 +54,7 @@ class CaptureController extends Controller
                 'content_type' => $file->getMimeType(),
                 'byte_size' => $file->getSize(),
             ],
-            now()->addSeconds(config('docket.ocr.capture_ttl'))
+            now()->addSeconds(config('ledger.ocr.capture_ttl'))
         );
 
         // The job picks Vision or falls back to the local Tesseract binary,

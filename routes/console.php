@@ -16,7 +16,7 @@ Artisan::command(
 |--------------------------------------------------------------------------
 |
 | Driven by one system cron on the server:
-|   * * * * * cd /var/www/docket && php artisan schedule:run >> /dev/null 2>&1
+|   * * * * * cd /var/www/ledger && php artisan schedule:run >> /dev/null 2>&1
 |
 | Times are server-local. Prune old backups first, then take the new one,
 | then verify the newest backup is fresh enough (emails if not).
@@ -28,7 +28,7 @@ Schedule::command('backup:monitor')->dailyAt('08:00');
 
 // Abandoned captures (photo taken, form never finished) leave a file in
 // receipts/pending/ behind after their cache entry expires.
-Schedule::command('docket:prune-captures')->daily();
+Schedule::command('ledger:prune-captures')->daily();
 
 // OCI Always Free reclaims instances that look idle (<20% CPU 95th
 // percentile over 7 days). A single-user app looks idle; this burns a

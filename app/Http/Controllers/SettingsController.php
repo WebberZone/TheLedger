@@ -26,10 +26,10 @@ class SettingsController extends Controller
             'settings' => $this->settings,
             // Read-only values displayed for context (not editable here).
             'info' => [
-                'Base currency' => config('docket.base_currency'),
-                'Currency symbol' => config('docket.currency_symbol'),
-                'Python binary' => config('docket.export.python_bin'),
-                'Export script' => config('docket.export.script'),
+                'Base currency' => config('ledger.base_currency'),
+                'Currency symbol' => config('ledger.currency_symbol'),
+                'Python binary' => config('ledger.export.python_bin'),
+                'Export script' => config('ledger.export.script'),
                 'Environment' => config('app.env'),
                 'App URL' => config('app.url'),
                 'Debug mode' => config('app.debug') ? 'On — should be off in production' : 'Off',
@@ -62,7 +62,7 @@ class SettingsController extends Controller
     }
 
     /**
-     * Whether the Tesseract fallback (config('docket.ocr.tesseract_binary'))
+     * Whether the Tesseract fallback (config('ledger.ocr.tesseract_binary'))
      * actually resolves on this host, plus which language packs it has —
      * OCR on a non-English receipt silently produces garbage without the
      * matching pack installed. When it's missing, show the install command
@@ -70,7 +70,7 @@ class SettingsController extends Controller
      */
     private function tesseractStatus(): string
     {
-        $resolved = $this->resolveTesseractBinary(config('docket.ocr.tesseract_binary'));
+        $resolved = $this->resolveTesseractBinary(config('ledger.ocr.tesseract_binary'));
 
         if ($resolved === null) {
             return PHP_OS_FAMILY === 'Darwin'

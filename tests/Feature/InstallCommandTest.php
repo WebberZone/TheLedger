@@ -23,7 +23,7 @@ class InstallCommandTest extends TestCase
     {
         parent::setUp();
 
-        $this->envDir = sys_get_temp_dir().'/docket-install-test-'.Str::random(8);
+        $this->envDir = sys_get_temp_dir().'/ledger-install-test-'.Str::random(8);
         mkdir($this->envDir);
         copy(base_path('.env.example'), $this->envDir.'/.env.example');
 
@@ -46,7 +46,7 @@ class InstallCommandTest extends TestCase
 
     public function test_installs_with_options_and_seeds_lookups(): void
     {
-        $this->artisan('docket:install', [
+        $this->artisan('ledger:install', [
             '--url' => 'https://ledger.example.com',
             '--name' => 'Jane Doe',
             '--email' => 'jane@example.com',
@@ -63,15 +63,15 @@ class InstallCommandTest extends TestCase
 
         $env = $this->envContents();
         $this->assertStringContainsString('APP_URL=https://ledger.example.com', $env);
-        $this->assertStringContainsString('DOCKET_USER_NAME="Jane Doe"', $env);
-        $this->assertStringContainsString('DOCKET_USER_EMAIL=jane@example.com', $env);
+        $this->assertStringContainsString('LEDGER_USER_NAME="Jane Doe"', $env);
+        $this->assertStringContainsString('LEDGER_USER_EMAIL=jane@example.com', $env);
         $this->assertMatchesRegularExpression('/^APP_KEY="?base64:/m', $env);
         $this->assertStringNotContainsString('super-secret-99', $env);
     }
 
     public function test_skip_lookups_leaves_taxonomy_empty(): void
     {
-        $this->artisan('docket:install', [
+        $this->artisan('ledger:install', [
             '--url' => 'http://localhost',
             '--name' => 'Jane Doe',
             '--email' => 'jane@example.com',
@@ -85,7 +85,7 @@ class InstallCommandTest extends TestCase
 
     public function test_non_interactive_install_generates_a_password(): void
     {
-        $this->artisan('docket:install', [
+        $this->artisan('ledger:install', [
             '--email' => 'owner@example.com',
             '--no-interaction' => true,
         ])->assertSuccessful();
@@ -97,8 +97,8 @@ class InstallCommandTest extends TestCase
 
     public function test_interactive_install_prompts_for_details(): void
     {
-        $this->artisan('docket:install')
-            ->expectsQuestion('What URL will Docket be served from?', 'https://docket.example.com')
+        $this->artisan('ledger:install')
+            ->expectsQuestion('What URL will Ledger be served from?', 'https://ledger.example.com')
             ->expectsQuestion('Your name', 'Sam Smith')
             ->expectsQuestion('Your email (used to log in)', 'sam@example.com')
             ->expectsQuestion('Choose a login password', 'another-secret-1')
@@ -114,7 +114,7 @@ class InstallCommandTest extends TestCase
     {
         User::factory()->create();
 
-        $this->artisan('docket:install', [
+        $this->artisan('ledger:install', [
             '--email' => 'jane@example.com',
             '--password' => 'super-secret-99',
         ])->assertFailed();
@@ -127,7 +127,7 @@ class InstallCommandTest extends TestCase
         $existing = User::factory()->create(['email' => 'jane@example.com']);
         $originalPassword = $existing->password;
 
-        $this->artisan('docket:install', [
+        $this->artisan('ledger:install', [
             '--url' => 'http://localhost',
             '--name' => 'Jane Doe',
             '--email' => 'jane@example.com',
@@ -142,7 +142,7 @@ class InstallCommandTest extends TestCase
 
     public function test_rejects_invalid_email(): void
     {
-        $this->artisan('docket:install', [
+        $this->artisan('ledger:install', [
             '--email' => 'not-an-email',
             '--password' => 'super-secret-99',
             '--no-interaction' => true,
@@ -153,7 +153,7 @@ class InstallCommandTest extends TestCase
 
     public function test_rejects_short_password(): void
     {
-        $this->artisan('docket:install', [
+        $this->artisan('ledger:install', [
             '--email' => 'jane@example.com',
             '--password' => 'short',
             '--no-interaction' => true,

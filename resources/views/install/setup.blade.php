@@ -1,9 +1,9 @@
 @extends('install.layout')
 
 @section('content')
-    <h2>Set up Docket</h2>
+    <h2>Set up Ledger</h2>
     <p>
-        Docket is a single-user app: this creates the one account you will
+        Ledger is a single-user app: this creates the one account you will
         log in with (there is no registration screen).
     </p>
 
@@ -66,7 +66,7 @@
         </div>
 
         <div class="actions">
-            <button type="submit" class="button">Install Docket</button>
+            <button type="submit" class="button">Install Ledger</button>
         </div>
     </form>
 @endsection

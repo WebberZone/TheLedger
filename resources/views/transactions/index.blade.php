@@ -74,7 +74,7 @@
                             </div>
                             <div class="text-right shrink-0">
                                 <div class="font-semibold tabular-nums">£{{ number_format($transaction->amount_gbp_minor / 100, 2) }}</div>
-                                @if ($transaction->currency !== config('docket.base_currency'))
+                                @if ($transaction->currency !== config('ledger.base_currency'))
                                     <div class="text-xs text-slate-500 tabular-nums">{{ $transaction->currency }} {{ $transaction->total_major }}</div>
                                 @endif
                             </div>
@@ -145,7 +145,7 @@
                                 <td class="px-4 py-3">{{ $transaction->paymentMethod?->name ?? '—' }}</td>
                                 <td class="px-4 py-3 text-right whitespace-nowrap">
                                     £{{ number_format($transaction->amount_gbp_minor / 100, 2) }}
-                                    @if ($transaction->currency !== config('docket.base_currency'))
+                                    @if ($transaction->currency !== config('ledger.base_currency'))
                                         <div class="text-xs text-slate-500">{{ $transaction->currency }} {{ $transaction->total_major }}</div>
                                     @endif
                                 </td>

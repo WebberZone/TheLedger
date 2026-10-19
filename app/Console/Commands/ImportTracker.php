@@ -17,11 +17,18 @@ use Illuminate\Console\Command;
  * by the export script (income.csv, expenses.csv, cashflows.csv,
  * balances.csv in the given directory).
  *
- *   php artisan docket:import-tracker /path/to/tracker-csv
+ *   php artisan ledger:import-tracker /path/to/tracker-csv
  */
 class ImportTracker extends Command
 {
-    protected $signature = 'docket:import-tracker {dir : Directory containing the exported CSVs}
+    /**
+     * The pre-rename name, kept so existing scripts and crontabs still work.
+     *
+     * @var list<string>
+     */
+    protected $aliases = ['docket:import-tracker'];
+
+    protected $signature = 'ledger:import-tracker {dir : Directory containing the exported CSVs}
                             {--force : Import even if transactions already exist}';
 
     protected $description = 'Import income/expenses/cash flows/balances exported from the Accounts Tracker spreadsheet';

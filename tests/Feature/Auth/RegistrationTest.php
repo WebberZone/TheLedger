@@ -9,7 +9,7 @@ class RegistrationTest extends TestCase
 {
     use RefreshDatabase;
 
-    // Docket is single-user: the account is seeded, registration is removed.
+    // Ledger is single-user: the account is seeded, registration is removed.
     public function test_registration_is_disabled(): void
     {
         $this->get('/register')->assertNotFound();

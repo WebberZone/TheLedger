@@ -15,7 +15,7 @@ class SettingsTest extends TestCase
     {
         config([
             'services.google_vision.credentials' => null,
-            'filesystems.disks.offsite.bucket' => 'docket-backups',
+            'filesystems.disks.offsite.bucket' => 'ledger-backups',
             'filesystems.disks.offsite.endpoint' => 'https://s3.eu-central-003.backblazeb2.com',
         ]);
 
@@ -24,7 +24,7 @@ class SettingsTest extends TestCase
         $response->assertOk();
         $response->assertSee('Info');
         $response->assertSee('Tesseract only (Google Vision not configured)');
-        $response->assertSee('docket-backups @ https://s3.eu-central-003.backblazeb2.com');
+        $response->assertSee('ledger-backups @ https://s3.eu-central-003.backblazeb2.com');
         $response->assertDontSee(config('app.key'));
     }
 
@@ -75,10 +75,10 @@ class SettingsTest extends TestCase
     {
         return array_merge([
             'currencies' => 'GBP, USD, EUR',
-            'receipts_mimes' => config('docket.receipts.mimes'),
-            'receipts_max_kb' => (string) config('docket.receipts.max_kb'),
-            'max_amount' => (string) config('docket.max_amount'),
-            'ocr_tries' => (string) config('docket.ocr.tries'),
+            'receipts_mimes' => config('ledger.receipts.mimes'),
+            'receipts_max_kb' => (string) config('ledger.receipts.max_kb'),
+            'max_amount' => (string) config('ledger.max_amount'),
+            'ocr_tries' => (string) config('ledger.ocr.tries'),
             'ocr_backoff' => '10, 60',
         ], $overrides);
     }
@@ -95,7 +95,7 @@ class SettingsTest extends TestCase
 
     public function test_tesseract_status_reports_install_instructions_when_missing(): void
     {
-        config(['docket.ocr.tesseract_binary' => 'this-binary-does-not-exist-xyz']);
+        config(['ledger.ocr.tesseract_binary' => 'this-binary-does-not-exist-xyz']);
 
         $response = $this->actingAs(User::factory()->create())->get('/settings');
 
@@ -110,7 +110,7 @@ class SettingsTest extends TestCase
         // "sh" stands in for a real, always-present binary — the point is
         // to exercise the resolves-successfully branch without depending
         // on tesseract actually being installed wherever tests run.
-        config(['docket.ocr.tesseract_binary' => 'sh']);
+        config(['ledger.ocr.tesseract_binary' => 'sh']);
 
         $response = $this->actingAs(User::factory()->create())->get('/settings');
 
@@ -132,7 +132,7 @@ class SettingsTest extends TestCase
             $this->markTestSkipped('Tesseract is not installed at a well-known path on this machine.');
         }
 
-        config(['docket.ocr.tesseract_binary' => 'tesseract']);
+        config(['ledger.ocr.tesseract_binary' => 'tesseract']);
         $originalPath = getenv('PATH');
         putenv('PATH=/nonexistent-directory-for-this-test');
 

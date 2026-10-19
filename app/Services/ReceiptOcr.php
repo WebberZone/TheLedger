@@ -102,7 +102,7 @@ class ReceiptOcr
     protected function detectTextViaTesseract(string $contents): string
     {
         return (new TesseractOCR())
-            ->executable(config('docket.ocr.tesseract_binary'))
+            ->executable(config('ledger.ocr.tesseract_binary'))
             ->imageData($contents, strlen($contents))
             ->psm(6)
             ->run();
@@ -142,7 +142,7 @@ class ReceiptOcr
             'date' => null,
             'amount' => null,
             'vat' => null,
-            'currency' => config('docket.base_currency'),
+            'currency' => config('ledger.base_currency'),
             'supplier' => null,
             'suggested_category' => null,
             'raw_text' => $text,

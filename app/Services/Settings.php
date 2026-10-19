@@ -6,7 +6,7 @@ use App\Models\Setting;
 use Illuminate\Support\Facades\Cache;
 
 /**
- * DB-backed overrides for the tunable knobs in config/docket.php.
+ * DB-backed overrides for the tunable knobs in config/ledger.php.
  *
  * The config file remains the source of truth for app-policy defaults and
  * the values that genuinely differ per host (env-derived). Anything listed
@@ -14,12 +14,12 @@ use Illuminate\Support\Facades\Cache;
  * Settings page; the override lives in the `settings` table.
  *
  * `get()` returns the DB override if one exists, otherwise falls back to
- * `config("docket.$key")`. The merged map is cached forever and invalidated
+ * `config("ledger.$key")`. The merged map is cached forever and invalidated
  * on every write, so callers pay one DB query per request at most.
  */
 class Settings
 {
-    public const CACHE_KEY = 'docket.settings.all';
+    public const CACHE_KEY = 'ledger.settings.all';
 
     /**
      * Extensions the receipts.mimes setting may contain. Receipts are
@@ -121,7 +121,7 @@ class Settings
      */
     public function get(string $key, mixed $default = null): mixed
     {
-        return $this->all()[$key] ?? $default ?? config("docket.$key");
+        return $this->all()[$key] ?? $default ?? config("ledger.$key");
     }
 
     /**
@@ -136,7 +136,7 @@ class Settings
 
                 $merged = [];
                 foreach (array_keys(self::fields()) as $key) {
-                    $merged[$key] = $rows[$key] ?? config("docket.$key");
+                    $merged[$key] = $rows[$key] ?? config("ledger.$key");
                 }
 
                 return $merged;

@@ -33,8 +33,8 @@ class ToolsController extends Controller
             ],
             'optimize' => [
                 'label' => 'Rebuild caches',
-                'description' => 'Re-cache events, routes and views for faster requests (docket:optimize). Run after deploying; config cache is skipped because it must be rebuilt from the command line in the correct environment.',
-                'command' => 'docket:optimize',
+                'description' => 'Re-cache events, routes and views for faster requests (ledger:optimize). Run after deploying; config cache is skipped because it must be rebuilt from the command line in the correct environment.',
+                'command' => 'ledger:optimize',
                 'params' => [],
             ],
             'migrate' => [
@@ -63,14 +63,14 @@ class ToolsController extends Controller
             ],
             'ocr-requeue' => [
                 'label' => 'Re-queue missing OCR',
-                'description' => 'Queue OCR extraction for receipts that never got a result (docket:ocr) — e.g. uploads made while the queue worker was down.',
-                'command' => 'docket:ocr',
+                'description' => 'Queue OCR extraction for receipts that never got a result (ledger:ocr) — e.g. uploads made while the queue worker was down.',
+                'command' => 'ledger:ocr',
                 'params' => [],
             ],
             'prune-captures' => [
                 'label' => 'Prune abandoned captures',
-                'description' => 'Delete pending capture photos older than 24 hours that never became an expense (docket:prune-captures). The scheduler does this nightly; this runs it now.',
-                'command' => 'docket:prune-captures',
+                'description' => 'Delete pending capture photos older than 24 hours that never became an expense (ledger:prune-captures). The scheduler does this nightly; this runs it now.',
+                'command' => 'ledger:prune-captures',
                 'params' => [],
             ],
             'backup-run' => [

@@ -31,7 +31,7 @@ class TransactionRequest extends FormRequest
             // (from the card statement) — the other is derived.
             'fx_rate' => [
                 'nullable', 'numeric', 'gt:0',
-                Rule::requiredIf(fn () => $this->input('currency') !== config('docket.base_currency') && ! $this->filled('amount_gbp')),
+                Rule::requiredIf(fn () => $this->input('currency') !== config('ledger.base_currency') && ! $this->filled('amount_gbp')),
             ],
             'amount_gbp' => ['nullable', 'numeric', 'gt:0', 'max:'.settings('max_amount')],
             'category_id' => ['required', 'exists:categories,id'],
@@ -58,7 +58,7 @@ class TransactionRequest extends FormRequest
     {
         $this->merge(
             [
-                'currency' => strtoupper((string) $this->input('currency', config('docket.base_currency'))),
+                'currency' => strtoupper((string) $this->input('currency', config('ledger.base_currency'))),
                 // Unchecked checkboxes are absent from the request entirely.
                 'is_billable' => $this->boolean('is_billable'),
             ]
@@ -79,7 +79,7 @@ class TransactionRequest extends FormRequest
         $vatMinor = (int) round((float) ($validated['vat'] ?? 0) * 100);
         $grossMinor = $amountMinor + $vatMinor;
 
-        if ($validated['currency'] === config('docket.base_currency')) {
+        if ($validated['currency'] === config('ledger.base_currency')) {
             $fxRate = 1.0;
             $gbpMinor = $grossMinor;
         } elseif (! empty($validated['amount_gbp'])) {

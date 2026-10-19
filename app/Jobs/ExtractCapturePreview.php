@@ -45,7 +45,7 @@ class ExtractCapturePreview implements ShouldQueue
         $contents = Storage::get($pending['path']);
 
         if ($contents === null) {
-            Cache::put($key, [...$pending, 'status' => 'failed'], now()->addSeconds(config('docket.ocr.capture_ttl')));
+            Cache::put($key, [...$pending, 'status' => 'failed'], now()->addSeconds(config('ledger.ocr.capture_ttl')));
 
             return;
         }
@@ -57,10 +57,10 @@ class ExtractCapturePreview implements ShouldQueue
             Cache::put(
                 $key,
                 [...$pending, 'status' => $status, 'ocr' => $extracted],
-                now()->addSeconds(config('docket.ocr.capture_ttl'))
+                now()->addSeconds(config('ledger.ocr.capture_ttl'))
             );
         } catch (\Exception) {
-            Cache::put($key, [...$pending, 'status' => 'failed'], now()->addSeconds(config('docket.ocr.capture_ttl')));
+            Cache::put($key, [...$pending, 'status' => 'failed'], now()->addSeconds(config('ledger.ocr.capture_ttl')));
         }
     }
 }

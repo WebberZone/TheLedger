@@ -1,8 +1,8 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "webberzone/thedocket",
+    "name": "webberzone/theledger",
     "type": "project",
-    "description": "Docket - a self-hosted, single-user expense and receipt tracker built on Laravel.",
+    "description": "Ledger - a self-hosted, single-user expense and receipt tracker built on Laravel.",
     "keywords": [
         "laravel",
         "expenses",
@@ -53,7 +53,7 @@
             "composer install",
             "npm install --ignore-scripts",
             "npm run build",
-            "@php artisan docket:install"
+            "@php artisan ledger:install"
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",

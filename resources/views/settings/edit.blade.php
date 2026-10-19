@@ -18,7 +18,7 @@
                             </h2>
 
                             <p class="mt-1 text-sm text-slate-600">
-                                {{ __('Tunable knobs that override the defaults in config/docket.php.') }}
+                                {{ __('Tunable knobs that override the defaults in config/ledger.php.') }}
                             </p>
                         </header>
 
@@ -57,7 +57,7 @@
                             </h2>
 
                             <p class="mt-1 text-sm text-slate-600">
-                                {{ __('Foundational or host-specific values that stay in config/docket.php or .env. The base currency is a core invariant: changing it at runtime would not recompute historical totals and would break the FX logic for new entries.') }}
+                                {{ __('Foundational or host-specific values that stay in config/ledger.php or .env. The base currency is a core invariant: changing it at runtime would not recompute historical totals and would break the FX logic for new entries.') }}
                             </p>
                         </header>
 
