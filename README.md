@@ -48,6 +48,17 @@ session scratchpad (`export_csv.py`); it reads a *copy* of the xlsx and
 never touches the original. Already run against the tracker as of
 July 2026 — totals matched to the penny.
 
+### Exporting the tracker
+
+**Reports → Export XLSX** writes everything back into an `.xlsx` laid
+out like the original spreadsheet. If your own template is at
+`storage/app/templates/tracker-template.xlsx` (it's git-ignored, so it
+stays on your server), the export uses it. Otherwise the export uses the
+blank template bundled at `resources/templates/tracker-template.xlsx`,
+which has the same sheets, tables and Summary formulas with plain styling.
+To rebuild that template, run
+`python/venv/bin/python python/scripts/build_blank_template.py resources/templates/tracker-template.xlsx`.
+
 ## Upgrading from Docket
 
 This app was called Docket until October 2026; the name now belongs to a
