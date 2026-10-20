@@ -82,7 +82,7 @@ class TrackerExportController extends Controller
             [
                 config('ledger.export.python_bin'),
                 config('ledger.export.script'),
-                storage_path('app/templates/tracker-template.xlsx'),
+                $this->templatePath(),
                 $jsonPath,
                 $outputPath,
             ]
@@ -101,6 +101,19 @@ class TrackerExportController extends Controller
         return (new BinaryFileResponse($outputPath))
             ->deleteFileAfterSend(true)
             ->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'Accounts Tracker.xlsx');
+    }
+
+    /**
+     * The owner's own template (built from the original spreadsheet and
+     * kept out of the repository) when it is installed, otherwise the
+     * blank one bundled with the app (python/scripts/build_blank_template.py),
+     * which has the same sheets, tables and Summary formulas.
+     */
+    private function templatePath(): string
+    {
+        $own = storage_path('app/templates/tracker-template.xlsx');
+
+        return is_file($own) ? $own : resource_path('templates/tracker-template.xlsx');
     }
 
     /**

@@ -24,11 +24,11 @@ return [
     | there is no registration flow, so these describe the owner.
     |
     | These values are used ONLY to bootstrap the account the first time it is
-    | seeded (DatabaseSeeder uses firstOrCreate, matching on email). Once the
+    | seeded, and only into an empty users table. Once the
     | user exists, re-seeding leaves it untouched and any in-app password change
     | is stored, hashed, in the database — the DB is the source of truth from
-    | then on. So set the password (at least) before the first db:seed in
-    | production; changing it here afterwards has no effect on the live account.
+    | then on. The seeder never creates a second account: once any user
+    | exists it leaves users alone, whatever email this config names.
     */
     'user' => [
         // ?: not the env() default param: a present-but-empty line in .env
@@ -36,7 +36,20 @@ return [
         // rather than falling back to these defaults.
         'name' => env('LEDGER_USER_NAME') ?: env('DOCKET_USER_NAME') ?: 'Ledger Owner',
         'email' => env('LEDGER_USER_EMAIL') ?: env('DOCKET_USER_EMAIL') ?: 'owner@example.com',
-        'password' => env('LEDGER_USER_PASSWORD') ?: env('DOCKET_USER_PASSWORD') ?: 'change-me-on-first-login',
+        // No default: a seeded account with a published password would open
+        // the whole ledger to anyone who read the source. DatabaseSeeder
+        // refuses to create the owner without one.
+        'password' => env('LEDGER_USER_PASSWORD') ?: env('DOCKET_USER_PASSWORD') ?: null,
+    ],
+
+    /*
+    | Installer state: the "installed" marker that keeps /install closed even
+    | if the database is briefly unreadable, the one-time setup code the web
+    | installer asks for, and the lock that serialises installations. Outside
+    | public/, and readable only from the server.
+    */
+    'install' => [
+        'state_path' => env('LEDGER_INSTALL_STATE_PATH') ?: storage_path('app/install'),
     ],
 
     /*

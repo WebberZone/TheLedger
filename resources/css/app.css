@@ -1,6 +1,8 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+/* The v3-style config (content paths, Figtree, the forms plugin) is kept
+   and loaded as-is. */
+@config '../../tailwind.config.js';
 
 /* Alpine: hide x-cloak elements until Alpine boots. */
 [x-cloak] {
