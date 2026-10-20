@@ -157,10 +157,57 @@ def populate_summary(years):
 populate_summary(data['years'])
 
 
-def populate_paypal(table_name, header_row, rows):
+def make_room_below(ws, table_name, rows_needed):
+    """Push everything below a table down so rows_needed data rows fit.
+
+    The PayPal sheet stacks two tables: USD on top, EUR below it. The
+    template leaves a fixed number of rows for USD, so a longer USD
+    ledger would otherwise be written straight over the EUR heading and
+    table. The rows up to the next content below the table (the EUR
+    heading) are free to use, less one blank separator row. When the
+    rows won't fit in that, everything from that content down (the EUR
+    heading, the EUR table and anything after it) moves down by the
+    shortfall, along with its merged cells and the refs of the tables it
+    contains.
+    """
+    min_col, header_row, max_col, max_row = range_boundaries(ws.tables[table_name].ref)
+    first_moved = next(
+        (
+            row[0].row
+            for row in ws.iter_rows(min_row=max_row + 1)
+            if any(cell.value is not None for cell in row)
+        ),
+        None,
+    )
+    if first_moved is None:
+        return
+
+    shift = (header_row + rows_needed) - (first_moved - 2)
+    if shift <= 0:
+        return
+
+    ws.move_range(
+        f'A{first_moved}:{get_column_letter(ws.max_column)}{ws.max_row}',
+        rows=shift,
+        translate=True,
+    )
+
+    for merged in ws.merged_cells.ranges:
+        if merged.min_row >= first_moved:
+            merged.shift(row_shift=shift)
+
+    for tbl in ws.tables.values():
+        t_min_col, t_min_row, t_max_col, t_max_row = range_boundaries(tbl.ref)
+        if t_min_row >= first_moved:
+            tbl.ref = f'{get_column_letter(t_min_col)}{t_min_row + shift}:{get_column_letter(t_max_col)}{t_max_row + shift}'
+
+
+def populate_paypal(table_name, rows):
     ws = wb['PayPal']
+    make_room_below(ws, table_name, len(rows))
     tbl = ws.tables[table_name]
     min_col, min_row, max_col, max_row = range_boundaries(tbl.ref)
+    header_row = min_row
     style_row = header_row + 1
 
     row_num = header_row + 1
@@ -182,8 +229,10 @@ def populate_paypal(table_name, header_row, rows):
     tbl.ref = f'{get_column_letter(min_col)}{header_row}:{get_column_letter(max_col)}{last_row}'
 
 
-populate_paypal('PayPal_USD', 6, data['paypal_usd'])
-populate_paypal('PayPal_EUR', 27, data['paypal_eur'])
+# USD first: it may push the EUR table down, which is then found by its
+# (updated) table ref rather than a fixed row.
+populate_paypal('PayPal_USD', data['paypal_usd'])
+populate_paypal('PayPal_EUR', data['paypal_eur'])
 
 
 #: Number formats lifted directly from the original workbook's Balances
