@@ -2,11 +2,14 @@
 
 namespace App\Services;
 
+use App\Exceptions\InstallStateUnknownException;
 use App\Models\User;
 use Database\Seeders\LookupSeeder;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
+use RuntimeException;
 use Throwable;
 
 /**
@@ -14,24 +17,128 @@ use Throwable;
  * (php artisan ledger:install) and the web installer (/install).
  * Each step is a small idempotent method so either front-end can run
  * them one at a time and narrate progress in its own way.
+ *
+ * Ledger has exactly one account, and the web installer is reachable by
+ * anyone who finds a fresh deployment, so installation is guarded three
+ * ways: the web form needs a setup code that can only be read on the
+ * server; installations are serialised by a lock and re-check ownership
+ * inside it; and createOwner() refuses outright once any account exists.
+ * Once installed, a marker file keeps the installer closed even when the
+ * database can't be read.
  */
 class Installer
 {
     public function __construct(protected Application $app) {}
 
     /**
-     * Ledger counts as installed once the owner account exists — the
-     * final step of either installer. Anything earlier (missing .env,
-     * empty database) is a fresh or half-finished install.
+     * Ledger counts as installed once the installed marker exists or an
+     * account does. A missing SQLite file is a fresh install; any other
+     * database error is not proof of anything, so it fails closed rather
+     * than reopening the installer on a live site.
+     *
+     * @throws InstallStateUnknownException
      */
     public function isInstalled(): bool
     {
-        try {
-            return Schema::hasTable('users') && User::query()->exists();
-        } catch (Throwable) {
-            // No database yet — definitely a fresh install.
-            return false;
+        if (is_file($this->statePath('installed'))) {
+            return true;
         }
+
+        try {
+            $installed = Schema::hasTable('users') && User::query()->exists();
+        } catch (Throwable $e) {
+            if ($this->databaseIsMissing()) {
+                return false;
+            }
+
+            throw new InstallStateUnknownException(
+                'Ledger could not read its database to check whether it is installed, so the installer stays closed. Check storage/logs/laravel.log.',
+                previous: $e,
+            );
+        }
+
+        if ($installed) {
+            // Installs from before the marker existed get one now.
+            $this->markInstalled();
+        }
+
+        return $installed;
+    }
+
+    /**
+     * Record a finished installation and retire the setup code.
+     */
+    public function markInstalled(): void
+    {
+        $this->ensureStateDirectory();
+        @file_put_contents($this->statePath('installed'), now()->toIso8601String()."\n");
+        @unlink($this->statePath('setup-code'));
+    }
+
+    /**
+     * The one-time code the web installer asks for, created on first use.
+     * Reading it needs shell access to the server, which is what proves
+     * the person at /install is the person deploying Ledger.
+     */
+    public function setupCode(): string
+    {
+        $path = $this->statePath('setup-code');
+
+        if (! is_file($path)) {
+            $this->ensureStateDirectory();
+            file_put_contents($path, implode('-', str_split(Str::lower(Str::random(16)), 4))."\n");
+            @chmod($path, 0600);
+        }
+
+        return trim((string) file_get_contents($path));
+    }
+
+    public function checkSetupCode(string $given): bool
+    {
+        return hash_equals($this->setupCode(), strtolower(trim($given)));
+    }
+
+    /**
+     * Where the setup code lives, relative to the app root when it is
+     * inside it, for showing in the installer.
+     */
+    public function setupCodeLocation(): string
+    {
+        return Str::after($this->statePath('setup-code'), $this->app->basePath().DIRECTORY_SEPARATOR);
+    }
+
+    /**
+     * Take the installation lock without waiting: a second installation
+     * running at the same moment is told to try again rather than queued
+     * behind the first.
+     *
+     * @return resource|null the lock handle, or null when it is held
+     */
+    public function acquireLock()
+    {
+        $this->ensureStateDirectory();
+        $handle = fopen($this->statePath('install.lock'), 'c');
+
+        if ($handle === false) {
+            throw new RuntimeException('Could not open the installation lock file.');
+        }
+
+        if (! flock($handle, LOCK_EX | LOCK_NB)) {
+            fclose($handle);
+
+            return null;
+        }
+
+        return $handle;
+    }
+
+    /**
+     * @param  resource  $handle
+     */
+    public function releaseLock($handle): void
+    {
+        flock($handle, LOCK_UN);
+        fclose($handle);
     }
 
     /**
@@ -130,7 +237,7 @@ class Installer
         $example = $this->app->environmentPath().DIRECTORY_SEPARATOR.'.env.example';
 
         if (! copy($example, $envPath)) {
-            throw new \RuntimeException("Could not create {$envPath} from .env.example.");
+            throw new RuntimeException("Could not create {$envPath} from .env.example.");
         }
 
         return true;
@@ -216,8 +323,23 @@ class Installer
         return User::query()->where('email', $email)->exists();
     }
 
+    /**
+     * Whether any account exists. Ledger has one, whatever its email.
+     */
+    public function hasOwner(): bool
+    {
+        return User::query()->exists();
+    }
+
+    /**
+     * @throws RuntimeException when an account already exists
+     */
     public function createOwner(string $name, string $email, string $plainPassword): User
     {
+        if ($this->hasOwner()) {
+            throw new RuntimeException('Ledger already has its owner account; it does not create a second one.');
+        }
+
         // The User model's 'hashed' cast hashes the plain password.
         return User::query()->create([
             'name' => $name,
@@ -232,6 +354,31 @@ class Installer
             '--class' => LookupSeeder::class,
             '--force' => true,
         ]) === 0;
+    }
+
+    protected function statePath(string $file): string
+    {
+        return rtrim((string) config('ledger.install.state_path'), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$file;
+    }
+
+    protected function ensureStateDirectory(): void
+    {
+        $directory = dirname($this->statePath('x'));
+
+        if (! is_dir($directory)) {
+            mkdir($directory, 0700, true);
+        }
+    }
+
+    /**
+     * True only for a fresh install: SQLite whose database file doesn't
+     * exist yet (or is still empty).
+     */
+    protected function databaseIsMissing(): bool
+    {
+        $path = $this->sqlitePath();
+
+        return $path !== null && (! is_file($path) || filesize($path) === 0);
     }
 
     /**
