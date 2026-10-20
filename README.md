@@ -92,10 +92,24 @@ npm install && npm run build
 
 Point your web server at `public/`, then open **`https://your-domain/install`**
 in a browser. The wizard checks the server requirements (PHP version,
-extensions, writable directories), then asks for your site URL, name, email
-and password, and installs. It only exists while Ledger has no user account —
-as soon as your login is created, `/install` permanently redirects to the
-login screen.
+extensions, writable directories), then asks for a setup code, your site
+URL, name, email and password, and installs.
+
+The setup code proves you control the server: anyone can find a fresh
+deployment's `/install`, so it won't create the account without it. Read
+it on the server once the setup page has loaded:
+
+```sh
+cat storage/app/install/setup-code
+```
+
+The installer only exists while Ledger has no user account. Once your
+login is created it leaves a marker (`storage/app/install/installed`) and
+`/install` permanently redirects to the login screen. If the database
+can't be read, it answers 503 rather than treating the site as fresh.
+Ledger has exactly one account: neither installer, nor `db:seed`, will
+create a second one, and `db:seed` refuses to create the first without
+`LEDGER_USER_PASSWORD` set (there is no default password).
 
 ### Console installer
 
@@ -177,16 +191,36 @@ BACKUP_REGION=auto
 
 ### Test a restore now, not in year three
 
+The database in the archive is an SQL dump (`db-dumps/*.sql`, written by
+`sqlite3 .dump`), not a database file: it has to be imported into a new
+database. Do it on a copy of the server if you can:
+
 ```sh
 php artisan backup:run                  # take one
 # download the newest zip from the bucket, then:
 unzip Ledger/….zip -d /tmp/restore
-mv /tmp/restore/db-dumps/database.sqlite database/database.sqlite
+ls /tmp/restore/db-dumps/               # one .sql file
+
+# Build a new database from the dump and check it.
+sqlite3 /tmp/restore/restored.sqlite < /tmp/restore/db-dumps/*.sql
+sqlite3 /tmp/restore/restored.sqlite "PRAGMA integrity_check;"      # expect: ok
+sqlite3 /tmp/restore/restored.sqlite "SELECT count(*) FROM transactions;"
+
+# Swap it in with nothing writing: stop the worker and the site first.
+php artisan down
+sudo systemctl stop ledger-worker       # whatever runs queue:work
+mkdir -p /tmp/before-restore && cp database/database.sqlite* /tmp/before-restore/
+mv /tmp/restore/restored.sqlite database/database.sqlite
+rm -f database/database.sqlite-wal database/database.sqlite-shm
 rsync -a /tmp/restore/…/storage/app/private/ storage/app/private/
-php artisan migrate:status              # sanity-check it boots against the restored DB
+chown -R www-data: database storage/app/private
+php artisan migrate --force             # if the backup predates a release
+php artisan up
+sudo systemctl start ledger-worker
 ```
 
 Open the app, confirm a known expense and its receipt image are present.
+The originals stay in `/tmp/before-restore` until you're satisfied.
 
 ## Out of scope, deliberately
 
