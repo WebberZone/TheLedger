@@ -19,7 +19,9 @@ Layout contract with populate_tracker.py:
 - Balances: header on row 6, data from row 7, columns B..H, with the
   four snapshot columns D..G matching BALANCE_DATE_COLUMNS in
   TrackerExportController.
-- PayPal: PayPal_USD with its header on row 6, PayPal_EUR on row 27.
+- PayPal: PayPal_USD with its header on row 6, PayPal_EUR below it on
+  row 27. populate_tracker.py finds both by their table refs and moves
+  the EUR section down when the USD rows need the space.
 """
 import sys
 
